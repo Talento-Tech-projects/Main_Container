@@ -1,0 +1,35 @@
+# Use postgres/example user/password credentials
+# docker compose  up -d 
+# docker build -t my-image .
+# docker run --name my-app -e DB_PASSWORD=example \
+#  -e DB_HOST=192.168.33.11 -e DB_PORT=5433 my-image
+
+services:
+
+  db:
+    image: postgres
+    restart: always
+    # set shared memory limit when using docker compose
+    shm_size: 128mb
+    volumes:
+      - ./resources/:/docker-entrypoint-initdb.d/
+    environment:
+      POSTGRES_PASSWORD: example
+      DB_USER: app_user
+      DB_PASSWORD: myapppwd
+      POSTGRES_DB: appdb
+      POSTGRES_USER: admin
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    ports:
+      - 5433:5432
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8081:8080
+ 
